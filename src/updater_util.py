@@ -3,7 +3,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def get_resource_path(resource="") -> Path:
+def get_resource_path(resource: str = ""):
     """
     Returns the path from root to a resource file. It does not check if the file exists.
     :param resource: str - The resource file name. Defaults to an empty string.
