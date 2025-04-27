@@ -1,8 +1,8 @@
 import notify2
 import constants
 
-
 notify2.init("Linux Discord Update Helper")
+
 
 def notify(title: str, message: str):
     """
