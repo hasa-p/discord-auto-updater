@@ -13,3 +13,8 @@ def get_location_header():
         return response_headers[constants.HEADERS_PROPERTY]
     else:
         raise ValueError("Invalid headers received from the server.")
+
+
+def download_latest_version():
+    # TODO: Implement the download logic
+    return None

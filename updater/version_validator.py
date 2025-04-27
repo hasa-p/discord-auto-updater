@@ -47,15 +47,26 @@ def detect_discord_version():
 
         return None
 
+
 def get_online_version():
     """
     Gets the latest version of Discord for Linux available online.
     :return: str - The latest version of Discord.
     """
     location_header = fetcher.get_location_header()
-    # example location: 'https://stable.dl2.discordapp.net/apps/linux/0.0.92/discord-0.0.92.deb'
-    # should extract 0.0.92
     try:
         version = re.search(r"discord-(\d+\.\d+\.\d+)\.deb", location_header).group(1)
+        return version.strip()
     except AttributeError:
         raise ValueError("Could not extract version from location header.")
+
+
+def validate_installed_version():
+    """
+    Validates the installed version of Discord against the latest version available online.
+    :return: bool - True if the installed version is up to date, False otherwise.
+    """
+    local_version = get_local_version()
+    online_version = get_online_version()
+
+    return local_version >= online_version
