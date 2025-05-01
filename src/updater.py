@@ -1,8 +1,8 @@
 import json
 import logging
 import os
-import subprocess
 import re
+import subprocess
 
 import constants
 import fetcher
@@ -30,6 +30,7 @@ class DiscordUpdater:
             return
 
         logging.info(f"Updating Discord from version {self.local_version} to {self.online_version}")
+        fetcher.download_latest_version()
         deb_path = util.get_resource_path(constants.DISCORD_DEB_FILENAME)
 
         if deb_path.exists():
