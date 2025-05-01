@@ -1,12 +1,12 @@
 import json
+import logging
 import os
 import subprocess
 import re
 
 import constants
 import fetcher
-import updater_util
-from notifier import Notifier
+import util
 
 
 class DiscordUpdater:
@@ -17,8 +17,7 @@ class DiscordUpdater:
     local_version = None
     online_version = None
 
-    def __init__(self, notifier: Notifier = None):
-        self.notifier = notifier or Notifier()
+    def __init__(self):
         self.local_version = self.get_local_version()
         self.online_version = self.get_online_version()
 
@@ -27,16 +26,19 @@ class DiscordUpdater:
         Updates Discord to the latest version by installing the downloaded .deb file.
         """
         if self.local_version >= self.online_version:
-            self.notifier.notify(
-                "Discord Updater",
-                f"Discord is already up to date (version {self.local_version})."
-            )
+            logging.warning(f"Discord is already up to date: {self.local_version}={self.online_version}")
             return
-        deb_path = updater_util.get_resource_path(constants.DISCORD_DEB_FILENAME)
+
+        logging.info(f"Updating Discord from version {self.local_version} to {self.online_version}")
+        deb_path = util.get_resource_path(constants.DISCORD_DEB_FILENAME)
+
         if deb_path.exists():
             try:
-                subprocess.run(["sudo", "dpkg", "-i", str(deb_path)], check=True)
-                subprocess.run(["rm", str(deb_path)], check=True)
+                logging.info(f"Installing Discord from {deb_path}")
+                subprocess.run(["sudo", "dpkg", "-i", str(deb_path)], check=True, shell=False)
+
+                logging.info("Discord installed successfully. Cleaning up...")
+                subprocess.run(["rm", str(deb_path)], check=True, shell=False)
             except subprocess.CalledProcessError as e:
                 raise RuntimeError(f"Failed to install Discord: {e}")
         else:
@@ -51,6 +53,7 @@ class DiscordUpdater:
         version = self.detect_discord_version()
 
         if version:
+            logging.info(f"Detected installed Discord version: {version}")
             return version
 
         raise DiscordNotFoundError("Could not determine installed Discord version.")
@@ -62,7 +65,7 @@ class DiscordUpdater:
         :return: str - The installed version of Discord, or None if not found.
         """
         try:
-            output = subprocess.check_output(["dpkg-query", "-W", "-f=${Version}", "discord"])
+            output = subprocess.check_output(["dpkg-query", "-W", "-f=${Version}", "discord"], shell=False)
             return output.decode().strip()
         except subprocess.CalledProcessError:
             for path in constants.DISCORD_DEFAULT_PATHS:
@@ -87,6 +90,7 @@ class DiscordUpdater:
         location_header = fetcher.get_location_header()
         try:
             version = re.search(r"discord-(\d+\.\d+\.\d+)\.deb", location_header).group(1)
+            logging.info(f"Detected online Discord version: {version}")
             return version.strip()
         except AttributeError:
             raise ValueError("Could not extract version from location header.")
