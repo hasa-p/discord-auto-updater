@@ -32,7 +32,7 @@ def download_latest_version():
         try:
             logging.info("Saving the downloaded file.")
             deb_path = util.get_resource_path(constants.DISCORD_DEB_FILENAME)
-            with deb_path.open("w") as file:
+            with deb_path.open("wb") as file:
                 file.write(response.content)
             logging.info(f"File saved to {deb_path}.")
         except IOError:

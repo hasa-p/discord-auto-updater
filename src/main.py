@@ -4,6 +4,16 @@ import subprocess
 from updater import DiscordUpdater
 
 
+def setup_logging():
+    """
+    Sets up the logging configuration.
+    """
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | [%(levelname)s] | %(message)s | function: %(funcName)s",
+        force=True
+    )
+
 def main():
     logging.info("Starting Discord Updater")
     updater = DiscordUpdater()
