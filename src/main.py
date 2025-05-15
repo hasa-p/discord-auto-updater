@@ -15,6 +15,7 @@ def setup_logging():
     )
 
 def main():
+    setup_logging()
     logging.info("Starting Discord Updater")
     updater = DiscordUpdater()
     updater.run()
