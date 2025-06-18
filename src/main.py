@@ -20,7 +20,12 @@ def main():
     updater = DiscordUpdater()
     updater.run()
     logging.info("Discord Updater finished. Launching Discord...")
-    subprocess.run(["discord"], shell=False)
+    subprocess.Popen(
+        ["discord"],
+        start_new_session=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
 
 if __name__ == "__main__":
     main()
