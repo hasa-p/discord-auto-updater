@@ -1,4 +1,5 @@
 import logging
+from notifier import Notifier  # Import Notifier
 
 import requests
 
@@ -20,11 +21,14 @@ def get_location_header():
         raise ValueError("Invalid headers received from the server.")
 
 
-def download_latest_version():
+def download_latest_version(notifier: Notifier = None):
     """
     Downloads the latest version of Discord for Linux.
+    :param notifier: Notifier instance for sending notifications.
     :return:
     """
+    if notifier:
+        notifier.notify("Discord Updater", "Downloading the latest version of Discord...")
     logging.info("Downloading the latest version of Discord.")
     response = requests.get(constants.DISCORD_DEB_URL, allow_redirects=True, timeout=60)
     if response.status_code == 200:
@@ -35,7 +39,13 @@ def download_latest_version():
             with deb_path.open("wb") as file:
                 file.write(response.content)
             logging.info(f"File saved to {deb_path}.")
+            if notifier:
+                notifier.notify("Discord Updater", f"Downloaded and saved to {deb_path}.")
         except IOError:
+            if notifier:
+                notifier.notify("Discord Updater", "Failed to save downloaded file.")
             raise IOError("Failed to save downloaded file.")
     else:
+        if notifier:
+            notifier.notify("Discord Updater", "Failed to download the latest version of Discord.")
         raise ValueError("Failed to download the latest version of Discord.")

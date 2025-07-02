@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import subprocess
+from notifier import Notifier  # Import Notifier
 
 import constants
 import fetcher
@@ -17,7 +18,8 @@ class DiscordUpdater:
     local_version = None
     online_version = None
 
-    def __init__(self):
+    def __init__(self, notifier: Notifier = None):
+        self.notifier = notifier
         self.local_version = self.get_local_version()
         self.online_version = self.get_online_version()
 
@@ -25,25 +27,44 @@ class DiscordUpdater:
         """
         Updates Discord to the latest version by installing the downloaded .deb file.
         """
+        if self.notifier:
+            self.notifier.notify("Discord Updater", f"Local version: {self.local_version}, Online version: {self.online_version}")
         if self.local_version >= self.online_version:
             logging.warning(f"Discord is already up to date: {self.local_version}={self.online_version}")
+            if self.notifier:
+                self.notifier.notify("Discord Updater", "Discord is already up to date.")
             return
 
         logging.info(f"Updating Discord from version {self.local_version} to {self.online_version}")
-        fetcher.download_latest_version()
-        deb_path = util.get_resource_path(constants.DISCORD_DEB_FILENAME)
+        if self.notifier:
+            self.notifier.notify("Discord Updater", f"Updating Discord from {self.local_version} to {self.online_version}")
+        try:
+            fetcher.download_latest_version(notifier=self.notifier)
+            deb_path = util.get_resource_path(constants.DISCORD_DEB_FILENAME)
 
-        if deb_path.exists():
-            try:
-                logging.info(f"Installing Discord from {deb_path}")
-                subprocess.run(["sudo", "dpkg", "-i", str(deb_path)], check=True, shell=False)
+            if deb_path.exists():
+                try:
+                    logging.info(f"Installing Discord from {deb_path}")
+                    if self.notifier:
+                        self.notifier.notify("Discord Updater", "Installing new Discord version...")
+                    subprocess.run(["sudo", "dpkg", "-i", str(deb_path)], check=True, shell=False)
 
-                logging.info("Discord installed successfully. Cleaning up...")
-                subprocess.run(["rm", str(deb_path)], check=True, shell=False)
-            except subprocess.CalledProcessError as e:
-                raise RuntimeError(f"Failed to install Discord: {e}")
-        else:
-            raise FileNotFoundError(f"{deb_path} not found.")
+                    logging.info("Discord installed successfully. Cleaning up...")
+                    if self.notifier:
+                        self.notifier.notify("Discord Updater", "Discord installed successfully. Cleaning up...")
+                    subprocess.run(["rm", str(deb_path)], check=True, shell=False)
+                except subprocess.CalledProcessError as e:
+                    if self.notifier:
+                        self.notifier.notify("Discord Updater", f"Failed to install Discord: {e}")
+                    raise RuntimeError(f"Failed to install Discord: {e}")
+            else:
+                if self.notifier:
+                    self.notifier.notify("Discord Updater", f"{deb_path} not found.")
+                raise FileNotFoundError(f"{deb_path} not found.")
+        except Exception as e:
+            if self.notifier:
+                self.notifier.notify("Discord Updater", f"Update failed: {e}")
+            raise
 
     def get_local_version(self):
         """

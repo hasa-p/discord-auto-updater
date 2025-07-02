@@ -1,6 +1,7 @@
 import logging
 import subprocess
 
+from notifier import Notifier
 from updater import DiscordUpdater
 
 
@@ -16,10 +17,13 @@ def setup_logging():
 
 def main():
     setup_logging()
+    notifier = Notifier()  # Instantiate Notifier
     logging.info("Starting Discord Updater")
-    updater = DiscordUpdater()
+    notifier.notify("Discord Updater", "Checking for Discord updates...")
+    updater = DiscordUpdater(notifier=notifier)  # Pass notifier to updater
     updater.run()
     logging.info("Discord Updater finished. Launching Discord...")
+    notifier.notify("Discord Updater", "Update process finished. Launching Discord.")
     subprocess.Popen(
         ["discord"],
         start_new_session=True,

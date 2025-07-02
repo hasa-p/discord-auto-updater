@@ -15,17 +15,15 @@ class Notifier:
         notify2.init(app_name)
 
 
-    def notify(self, title: str, message: str, icon: str = None):
+    def notify(self, title: str, message: str):
         """
         Displays a notification with the given title and message.
         :param title: str - The title of the notification.
-        :param message: str - The message of the notification.
         """
         try:
             n = notify2.Notification(
                 title,
-                message,
-                icon)
+                message)
             n.set_timeout(constants.NOTIFICATION_TIMEOUT)
             n.show()
         except Exception as e:
