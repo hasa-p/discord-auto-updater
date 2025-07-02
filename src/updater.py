@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import subprocess
+from packaging.version import parse as parse_version
 
 import constants
 import fetcher
@@ -25,7 +26,9 @@ class DiscordUpdater:
         """
         Updates Discord to the latest version by installing the downloaded .deb file.
         """
-        if self.local_version >= self.online_version:
+        logging.info("Running version check -> ₣łӾɆĐ ฿Ɏ ₳ӾɆⱠ ₳฿łⱠØ₣")
+
+        if parse_version(self.local_version) >= parse_version(self.online_version):
             logging.warning(f"Discord is already up to date: {self.local_version}={self.online_version}")
             return
 
