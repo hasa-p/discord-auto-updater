@@ -16,10 +16,10 @@ def setup_logging():
 
 def main():
     setup_logging()
-    logging.info("Starting Discord Updater")
+    logging.info("Starting Discord Auto-Updater")
     updater = DiscordUpdater()
     updater.run()
-    logging.info("Discord Updater finished. Launching Discord...")
+    logging.info("Discord Auto-Updater finished. Launching Discord...")
     subprocess.Popen(
         ["discord"],
         start_new_session=True,
