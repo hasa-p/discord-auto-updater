@@ -5,9 +5,13 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
+ExecStartPre=/bin/sleep 10
 ExecStart=/usr/bin/python3 %h/discord-auto-updater/src/main.py
 StandardOutput=journal
 StandardError=journal
+Restart=on-failure
+RestartSec=30
+RemainAfterExit=no
 
 [Install]
 WantedBy=default.target

@@ -20,12 +20,7 @@ def main():
     updater = DiscordUpdater()
     updater.run()
     logging.info("Discord Auto-Updater finished. Launching Discord...")
-    subprocess.Popen(
-        ["discord"],
-        start_new_session=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    subprocess.run(["systemd-run", "--user", "--scope", "discord"])
 
 if __name__ == "__main__":
     main()
